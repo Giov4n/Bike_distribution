@@ -1,0 +1,31 @@
+.Python
+env/
+build/
+var/
+dist/
+downloads/
+*installed.cfg
+
+# Logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# DotEnv configuration
+.env
+
+# Database
+*.db
+*.rdb
+
+# Pycharm
+.idea
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Spyder
+.spyproject/
+
+# Jupyter NB Checkpoints
+.ipynb_checkpoints/
