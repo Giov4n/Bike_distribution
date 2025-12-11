@@ -13,5 +13,6 @@ With it, the relevant logistic issues were presented in the interactive charts u
 Uncover distribution inefficiencies based on rental patterns to circumvent availability issues.
 
 ## Data Sources:
- [Citi Bike Trip Data]( https://s3.amazonaws.com/tripdata/index.html)
-[La Guardia, NY API Data ](https://www.ncdc.noaa.gov/cdo-web/api/v2/data?datasetid=GHCND&datatypeid=TAVG&limit=1000&stationid=GHCND:USW00014732&startdate=2022-01-01&enddate=2022-12-31)
+1. [Citi Bike Trip Data]( https://s3.amazonaws.com/tripdata/index.html)
+ 
+2. [La Guardia, NY API Data ](https://www.ncdc.noaa.gov/cdo-web/api/v2/data?datasetid=GHCND&datatypeid=TAVG&limit=1000&stationid=GHCND:USW00014732&startdate=2022-01-01&enddate=2022-12-31)
