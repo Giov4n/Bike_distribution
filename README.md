@@ -1,4 +1,4 @@
-# ** Bike Distribution Analysis Dashboard**
+# **Bike Distribution Analysis Dashboard**
 
 ## Introduction:
 This project delves into the usage patterns, station logistics, and weather temperatures that influence the New York Citi Bike sharing system to uncover distribution inefficiencies of bike rentals with the aim of circumventing availability issues. By examining January to December 2022 bike trip and weather data, I used pandas, Matplotlib, and Seaborn to analyze:
