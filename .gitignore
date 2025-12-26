@@ -29,3 +29,10 @@ pip-delete-this-directory.txt
 
 # Jupyter NB Checkpoints
 .ipynb_checkpoints/
+
+# PyCache
+__pycache__
+
+# Streamlit
+.streamlit
+database_utils.py
