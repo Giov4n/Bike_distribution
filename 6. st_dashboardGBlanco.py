@@ -10,7 +10,7 @@ from streamlit_keplergl import keplergl_static
 from datetime import datetime as dt
 from numerize.numerize import numerize
 from PIL import Image
-from database_utils import SecureGridFSHandler, get_mongo_config
+from database_utils import SecureGridFSHandler, SecureBulkUploader, get_mongo_config
 import streamlit.components.v1 as components
 
 ################################## Configuring the Dashboard Page ##############################
@@ -26,9 +26,21 @@ config = get_mongo_config()
 user_id = config['default_user_id']
 
 # Loaded data into MongoDB using:
-# topStart = handler.save_csv_from_file(user_id, r"D:\Data_Analysis\05-12-2025_Bike_Dashboard\02.Data\Prepared Data\Top_Start.csv", 'Top_Start')
-# bikeTrips = handler.save_csv_from_file(user_id, r"D:\Data_Analysis\05-12-2025_Bike_Dashboard\02.Data\Prepared Data\Reduced_Trips.csv", 'Reduced_Trips')
-# arcsMap = handler.save_html_from_file(user_id, r"D:\Data_Analysis\05-12-2025_Bike_Dashboard\02.Data\CitiBike_Trip_Routes_Map.html", "CitiBike_Trip_Routes_Map")
+# uploader = SecureBulkUploader()
+# TARGET_FILES = [
+#        "Top_Start.csv",
+#        "Reduced_Trips.csv",
+#        "CitiBike_Trip_Routes_Map.html",
+#    ]
+#    
+#    results = uploader.upload_files(
+#        base_folder="./data",
+#        file_list=TARGET_FILES,
+#        user_id=user_id,
+#        parallel=True,
+#        max_workers=4,
+#        compress=True
+#    )
 
 # Fetching previously loaded csv files
 @st.cache_data

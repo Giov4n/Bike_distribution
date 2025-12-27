@@ -35,4 +35,8 @@ __pycache__
 
 # Streamlit
 .streamlit
+
+# additional files for now
 database_utils.py
+st_dashboardGBlanco.py
+Dashboard Charts.ipynb
