@@ -1,0 +1,14 @@
+Start Station,Average Daily Starts,Peak Hour Share,Stockout Risk,Min Bikes Required,Re-Stock Rule
+Grove St PATH,42556,0.14585487357834384,48763.0,8106,Overnight and Early AM Re-Stocking
+South Waterfront Walkway - Sinatra Dr & 1 St,34245,0.15292743466199446,39482.0,6523,Overnight and Early AM Re-Stocking
+Hoboken Terminal - River St & Hudson Pl,33020,0.1343731072077529,37457.0,6290,Overnight and Early AM Re-Stocking
+Hoboken Terminal - Hudson St & Hudson Pl,30244,0.17074461050125644,35408.0,5761,Overnight Re-Stocking
+Hamilton Park,20477,0.3654832250817991,27961.000000000004,3900,Overnight Re-Stocking
+Newport Pkwy,21961,0.23373252584126405,27094.0,4183,Overnight Re-Stocking
+City Hall - Washington St & 1 St,23289,0.13371119412598223,26403.000000000004,4436,Overnight Re-Stocking
+Marin Light Rail,19230,0.3580343213728549,26115.0,3663,Overnight Re-Stocking
+Hoboken Ave at Monmouth St,19501,0.30372801394800264,25424.0,3714,Overnight Re-Stocking
+Newport PATH,19965,0.1746556473829201,23452.0,3803,Overnight Re-Stocking
+12 St & Sinatra Dr N,17137,0.22973682674913928,21074.0,3264,Overnight Re-Stocking
+14 St Ferry - 14 St & Shipyard Ln,17066,0.222254775577171,20859.0,3251,Overnight Re-Stocking
+Columbus Dr at Exchange Pl,16731,0.11923973462435,18726.0,3187,Overnight Re-Stocking

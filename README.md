@@ -2,13 +2,17 @@
 
 ## Introduction:
 
-This project delves into the usage patterns, station logistics and weather temperatures that influence the New York Citi Bike sharing system to uncover distribution inefficiencies on bike rentals with the aim of circumventing availability issues. By examining the existing January to December 2022 bike trip and weather data, I used pandas, Matplotlib, and Seaborn to analyze:
+CitiBike's growth bolstered by effective sustainability-focused marketing since 2013 was accelerated by the pandemic-era demand, which subsequently strained it's operational model. The system has been struggling with logistical imbalances - empty or full stations - that now drive customer complaints.
+
+
+
+This project delves into the usage patterns, station logistics and weather temperatures that influence the New York CitiBike sharing system to uncover distribution inefficiencies on bike rentals with the aim of circumventing availability issues. By examining the existing January to December 2022 bike trip and weather data, I used pandas, Matplotlib, and Seaborn to analyze:
 
 * Weather temperature impact on demand
 * Trip duration
 * Station activity
 * User profiles
-* Weekday vs weekend activity
+* Weekday vs time of day activity
 
 With it, the relevant logistic issues were presented in the interactive charts using Plotly and Kepler.gl and designed with Streamlit on the final dashboard.
 
@@ -25,7 +29,10 @@ Uncover distribution inefficiencies based on rental patterns to circumvent avail
 
 Key findings that will contribute to a more efficient distribution of resources include:
 
-* The use short-term logistic forecasting based on weather patterns to address availability issues.
-* Resource redistribution according to station proximity to residential areas, waterfront zones, and transit hub stations.
+* The use short-term logistic forecasting based on weather patterns to adapt to seasonal surges.
 * Bike maintenance and fleet replacement periods based on weather patterns and riding probabilities.
 * Crew coordination oriented to avoid depletion while accommodating user bike riding preferences.
+* Implementation of flexible dock usage and user alerts to guide riders towards nearby stations with available docks during peak traffic times.
+* Fleet scaling and bike stocking plans to improve resource utilization.
+* Resource redistribution according to station proximity to residential areas, waterfront zones, and transit hub stations.
+* Foster the use of low density stations near other touristic attractions and traffic gateways through discounts, special packages and special events that encourage a more balanced bike use.
