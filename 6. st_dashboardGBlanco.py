@@ -17,13 +17,73 @@ from database_utils import SecureGridFSHandler, SecureBulkUploader, get_mongo_co
 import streamlit.components.v1 as components
 from typing import Iterable, Dict, Union
 
+################################## Defining Session Onboarding Functions##############################
+# Defining function to start session
+def new_session():
+    if st.query_params.get('onboarding') == 'done':
+        st.session_state['onboarding_complete'] = True
+        
+    defaults = {
+        'onboarding_complete': False,
+        'onboarding_step': 0,
+        'show_help': True}
+    for key, value in defaults.items():
+        if key not in st.session_state:
+            st.session_state[key] = value
+
+new_session()
+
+ONBOARDING_STEPS = [{'title': 'Welcome! 👋', 'description': "This dashboard helps you explore CitiBike's trip data with key metrics designed to capture insights and suggest strategic operational changes. The insights shown on the charts are based on an 8% representative sample of the full dataset to balance performance and accuracy. The patterns, trends and directional changes reflect the overall population, but exact totals are only shown on the sidebar and chart callouts. Chart figures that appear upon hovering can be multiplied by 12.5 to derive the complete dataset figure."},
+                    {'title': 'Navigation', 'description': "👈 Use the sidebar to filter data and switch views. The **Section Selector** dropdown menu on the left will take you to the analysis details of each aspect starting at Overview."},
+                    {'title': 'Interacting with Charts', 'description': "Hover over charts to see details. You can also zoom on the data by selecting directly on the chart the part you would like to view in more detail. Keep in mind charts and tables are designed for exploratory analysis that preserves meaningful patterns."},
+                    {'title': "Ready to enjoy?", 'description': "All Visuals update automatically. You can now explore the dashboard on your own."}]
+
+def main():
+    st.title('CitiBike Operational Analysis Dashboard')
+
+    #blocking dashboard until unboarding is complete
+    if not st.session_state.onboarding_complete:
+        with st.expander('How to read this dashboard', expanded=True):
+            step = st.session_state.onboarding_step
+            step_data = ONBOARDING_STEPS[step]
+            st.subheader(step_data['title'])
+            st.write(step_data['description'])
+
+            col1, col2, = st.columns(2)
+
+            with col1:
+                if step > 0:
+                    if st.button('Back'):
+                        st.session_state.onboarding_step -= 1
+                        st.rerun()
+
+            with col2:
+                if step < len(ONBOARDING_STEPS) - 1:
+                    if st.button('Next'):
+                        st.session_state.onboarding_step += 1
+                        st.rerun()
+                else:
+                    if st.button('Finish Onboarding'):
+                        st.session_state.onboarding_complete = True
+                        st.query_params['onboarding'] = 'done'
+                        st.rerun()
+
+    if st.sidebar.button('Restart Onboarding'):
+        st.session_state.onboarding_complete = False
+        st.session_state.onboarding_step = 0
+        st.query_params.clear()
+        st.rerun()
+
+if __name__ == '__main__':
+        main()
+
 ################################## Configuring the Dashboard Page ##############################
 st.set_page_config(page_title = 'CitiBike 2022 Strategy Dashboard', layout='wide')
 
-st.title('CitiBike Operational Analysis Dashboard')
+st.sidebar.info('Choose an option from this sidebar to update the dashboard.')
 st.sidebar.title('Section Selector')
 page = st.sidebar.selectbox('Select to View a Dashboard Section',
-                           ['Overview', 'Daily Weather vs Rides', 'Stations & Routes', 'Trip Duration', 'Actionable Insights', 'Recommendations'])
+                           ['Overview', 'Daily Weather vs Rides', 'Stations & Routes', 'Trip Duration', 'Actionable Insights', 'Recommendations'], help='Select one to switch views.')
 
 ################################ Initializing Custom Defined Handler ##############################
 # Defining a project root for local files
@@ -57,7 +117,8 @@ except Exception:
 #                "CB-Community.jpg",
 #                "Fleet_Plan.csv",
 #                "Restocking_Plan.csv",
-#                "Water_Stations.csv"]
+#                "Water_Stations.csv",
+#                "CitiBike_Trip_Routes_Map.html"]
 #
 # results = uploader.upload_files(
 # base_folder="./data",
@@ -65,8 +126,7 @@ except Exception:
 # user_id=user_id,
 # parallel=True,
 # max_workers=4,
-# compress=True
-#    )
+#compress=True)
 
 ########################################### Importing Data #######################################
 
@@ -169,7 +229,7 @@ if page == 'Overview':
     - Actionable Insights
     - Conclusions and Recommendations""")
 
-    st.markdown("""**👈 The Section Selector dropdown menu on the left will take you to the analysis details of each aspect. Please note this analysis uses pre-processed data sourced from the CitiBike's website and NOAA API for La Guardia (NY) Weather, which included bike type; start station name, ID, lattitude and longitude; end station name, ID, lattitude and longitude; trip start and end times; user type and average temperature.**""")
+    st.markdown("""**Please note this analysis uses pre-processed data sourced from the CitiBike's website and NOAA API for La Guardia (NY) Weather, which included bike type; start station name, ID, lattitude and longitude; end station name, ID, lattitude and longitude; trip start and end times; user type and average temperature.**""")
 
 
     stationimage = Image.open(io.BytesIO(CB_photo))
@@ -177,14 +237,14 @@ if page == 'Overview':
 
 ############################################ Weather vs Rides Charts #######################################
 elif page == 'Daily Weather vs Rides':
-    st.subheader('Can any user preference be inferred from daily 🚲 rides vs weather temperatures 🌦️?')
+    st.subheader('Identifying 🌦️ weather related trip patterns and seasonal surges 🚲.')
 
     # Creating side-bar filter
     with st.sidebar:
-        season_filter = st.multiselect(label='Select the Season', options=bikeTrips['season'].unique(), default=bikeTrips['season'].unique())
+        season_filter = st.multiselect(label='Select the Season', options=bikeTrips['season'].unique(), default=bikeTrips['season'].unique(), help='Select Winter to filter for December to February, Spring for March to May, Summer for June to August and Fall for September to November.')
         tripSeasons = bikeTrips.query('season == @season_filter')
-        total_rides = float(tripSeasons['daily_rides'].count())
-        st.metric(label = 'Total Bike Rides', value=numerize(total_rides))
+        total_rides = float(tripSeasons['daily_rides'].count()*12.5)
+        st.metric(label = 'Total Bike Rides', value=numerize(total_rides), help='This number reflects the full dataset ride count figure, while the chart is a reduced representation that can be multiplied by 12.5 to derive the complete dataset figure.')
 
     col1, col2 = st.columns([3, 1])
 
@@ -204,6 +264,15 @@ elif page == 'Daily Weather vs Rides':
     fig_DAline.update_yaxes(title_text='Sum of Daily Rides', secondary_y=False, color='navy', title=dict(font=dict(size=16, color='midnightblue')))
     fig_DAline.update_yaxes(title_text='Daily Average Temperature', secondary_y=True, color='violet', title=dict(font=dict(size=16, color='midnightblue')))
 
+    # Calculating Pearson's correlation coefficient
+    correlation = tripSeasons['daily_rides'].corr(tripSeasons['avgTemp'])
+    
+    # Calculating median values for easier interpretation
+    member_median = tripSeasons[tripSeasons['member_casual'] == 'member']['avgTemp'].median()
+    casual_median = tripSeasons[tripSeasons['member_casual'] == 'casual']['avgTemp'].median()
+
+    fig_DAline.add_annotation(text=f'Exhibiting a {"Strong Positive" if correlation > 0.7 else "Moderate Positive" if correlation > 0.4 else "Weak"} Correlation of {correlation:.3f}', xref='paper', yref='paper', x=0.001, y=1.01, showarrow=False, font=dict(size=16, color='indigo'))
+
     # Creating Average Temperature per User Type Box Plot
     userTemp_box = go.Figure()
 
@@ -211,34 +280,26 @@ elif page == 'Daily Weather vs Rides':
         userTemp_box.add_trace(go.Box(x=tripSeasons[tripSeasons['rideable_type'] == ride_type]['member_casual'], y=tripSeasons[tripSeasons['rideable_type'] == ride_type]['avgTemp'], name=ride_type, boxmean=True))
 
     userTemp_box.update_layout(title=dict(text='Riding Temperature per User', x=0.5, xanchor= 'center', font=dict(size=15, color='navy', family='bree, sans-serif')),
-                             legend=dict(yanchor='auto', y=0.4, xanchor='auto', x=0.26, bgcolor='rgba(255,255,255,0.5)'),
+                             legend=dict(yanchor='auto', y=0.00, xanchor='auto', x=.51, bgcolor='rgba(255,255,255,0.5)'),
                              boxmode='group',
                              plot_bgcolor='lightsteelblue',
                              paper_bgcolor='white',
                              height=600)
 
-    # Calculating Pearson's correlation coefficient
-    correlation = tripSeasons['daily_rides'].corr(tripSeasons['avgTemp'])
-    
-    # Calculating median values for easier interpretation
-    member_median = tripSeasons[tripSeasons['member_casual'] == 'member']['avgTemp'].median()
-    casual_median = tripSeasons[tripSeasons['member_casual'] == 'casual']['avgTemp'].median()
+    userTemp_box.add_annotation(text=f'Members ride at: {member_median:.1f}°C<br> Casual users do at: {casual_median:.1f}°C.', xref='paper', yref='paper', x=0.5, y=1.07, xanchor='center', showarrow=False, font=dict(size=14, color='indigo'))
     
     with st.container():
         with col1:
             st.plotly_chart(fig_DAline, use_container_width=True)
         with col2:
             st.plotly_chart(userTemp_box, use_container_width=True)
-        st.caption(f'Daily Rides and Daily Average Temperature have a '
-                   f'{"Strong Positive" if correlation > 0.7 else "Moderate Positive" if correlation > 0.4 else "Weak"} Correlation of {correlation:.3f} '
-                   f'and box plot suggests members ride at: {member_median:.1f}°C\nwhile casual users ride at: {casual_median:.1f}°C.')
     
         st.markdown("""*The daily rides and weather temperatures strong positive correlation of 0.814 suggests trips increase at similar levels as temperatures, but decline slightly when temperatures exceed the 30°C. The trip spikes between May and November seem to indicate the availability issues may be prevalent during the warm to cool temperature months.*""")
         st.markdown("""*The box plot lower whiskers confirms members are more resilient to low temperatures, while the interquartile range boxes confirm that most trips take place during warm to cool weather temperatures with members riding bikes at a median of 17.8°C and casual users prefering warmer temperatures with a median of about 20.5°C. The presence of docked bikes for casual users suggests bikes used for recreational purposes remain locked mostly during high season months.*""")
 
 ######################################## Stations & Routes Map ####################################
 elif page == 'Stations & Routes':
-    st.subheader('Which are the most popular bike stations pairs and common routes 🏙️?')
+    st.subheader('Unveiling high-traffic bike stations, typical routes and zones favored by users 🏙️.')
 
     topStart = pd.DataFrame(bikeTrips['start_station_name'].value_counts().head(20)).reset_index()
     topStart.rename(columns={'start_station_name':'start_station', 'count':'total_trips'}, inplace=True)
@@ -263,22 +324,22 @@ elif page == 'Stations & Routes':
             st.components.v1.html(arcsMap, height=700, scrolling=True)
         with col2:
             st.plotly_chart(fig_top20, use_container_width=True)
-        st.caption(f'The Top 4 stations account for {Top4_proportion:.2%} of the all trips recorded in 2022.')
+        st.markdown(f':green[The Top 4 stations account for {Top4_proportion:.2%} of the all trips recorded in 2022.]')
 
-        st.markdown("""*The origin-destination pairs connected by the map arcs ⋒ reveal that Hoboken City is the busiest zone with the most intra-zonal flows. The most popular start stations, located near the Hudson River, are also part of the most popular routes: Grove St. PATH to Montgomery St. covering a distance of 6 blocks (895 trips), South Waterfront Walkway – Sinatra Dr. & 1st St to Bloomfield St. & 15th St covering a distance of 18 blocks (with 977 trips), Hoboken Terminal on River St City & Hudson Pl. to Church Sq. Park on 5 St & Park Ave. covering a distance of 11 blocks (968 trips), City Hall on Washington St. & 1 St. to Columbus Park on Clinton St. and 9 St. covering a short distance of 13 blocks (with 923 trips).*""")
-        st.markdown("""*Grove St, South Waterfront Walkway, and Hoboken Terminal Stations account for almost about 15.66% of the total bike rental trips. Their strategic location near the water combined with the city's transit network gateway offered by the Hoboken Terminal make the small-town charm of Hoboken City an atractive zone. New Jersey City is the second busiest zone and interestingly the least connected zone is New York City, which accounts for most inactive end stations suggesting a bridge crossing difficulty.*""")
+        st.markdown("""*The origin-destination pairs connected by the map arcs ⋒ reveal that Hoboken City is the busiest zone with the most intra-zonal flows. The most popular start stations, located near the Hudson River, are also part of the most popular routes: Grove St. PATH to Montgomery St. covering a distance of 6 blocks (895 trips), South Waterfront Walkway – Sinatra Dr. & 1st St to Bloomfield St. & 15th St covering a distance of 18 blocks (with 977 trips), Hoboken Terminal on River St & Hudson Pl. to Church Sq. Park on 5 St & Park Ave. covering a distance of 11 blocks (968 trips), Hoboken Terminal on Hudson St. & Hudson Place to Columbus Park on Clinton St. & 9 St. covering a short distance of 15 blocks (with 977 trips).*""")
+        st.markdown("""*These 4 Stations account for almost approximately 15.66% of the total bike rental trips. Their strategic location near the water combined with the city's transit network gateway offered by the Hoboken Terminal make the small-town charm of Hoboken City an atractive zone. New Jersey City is the second busiest zone and interestingly the least connected zone is New York City, which accounts for most inactive end stations suggesting a bridge crossing difficulty.*""")
 
 ############################################ Trip Duration Charts #########################################
 elif page == 'Trip Duration':
     
-    st.subheader('What usage patterns can be uncovered from trip duration ⌛?')
+    st.subheader('Revealing initial clues on availability issues based on weekly ridership duration ⌛.')
 
     # Creating side-bar filter
     with st.sidebar:
-        season_filter = st.multiselect(label='Select the Season', options=bikeTrips['season'].unique(), default=bikeTrips['season'].unique())
+        season_filter = st.multiselect(label='Select the Season', options=bikeTrips['season'].unique(), default=bikeTrips['season'].unique(), help='Select Winter to filter for December to February, Spring for March to May, Summer for June to August and Fall for September to November.')
         tripSeasons = bikeTrips.query('season == @season_filter')
-        total_rides = float(tripSeasons['daily_rides'].count())
-        st.metric(label = 'Total Bike Rides', value=numerize(total_rides))
+        total_rides = float(tripSeasons['daily_rides'].count()*12.5)
+        st.metric(label = 'Total Bike Rides', value=numerize(total_rides), help='This number reflects the full dataset ride count figure, while the chart is a reduced representation that can be multiplied by 12.5 to derive the complete dataset figure.')
 
     filtered = tripSeasons[tripSeasons['rideable_type'].isin(['classic_bike', 'electric_bike'])]
 
@@ -294,7 +355,7 @@ elif page == 'Trip Duration':
     duration_line.add_trace(go.Histogram(histfunc='count', x=filtered['day_name'], name='Total Trips'), row=2, col=1)
 
     # Find the max and round up to nearest minute mark
-    end_point = (max(filtered['trip_duration'])//60 + 1) * 60
+    end_point = (max(filtered['trip_duration'])//60 + 1) * 60 if not filtered.empty else 60
     tick_loc = np.arange(0, end_point + 1, 180)
     tick_labels = [f'{int(s // 60):02d}:{int(s % 60):02d}' for s in tick_loc]
 
@@ -307,6 +368,13 @@ elif page == 'Trip Duration':
                  paper_bgcolor='white',
                  height=600)
 
+    # Calculating number of trips exceeding 24 hours.
+    Below1hr = (filtered['trip_duration'] < 3_600).sum()
+    From1to24hrs = filtered['trip_duration'].between(3_600, 86_400).sum()
+    Over24hrs = (filtered['trip_duration'] > 86_400).sum()
+    
+    duration_line.add_annotation(text=f'Total trips below 1 hour: {Below1hr*12.5:,.0f}<br>between 1 - 24 hours: {From1to24hrs*12.5:,.0f}<br>over 24 hours: {Over24hrs*12.5:,.0f}', xref='paper', yref='paper', x=0.001, y=1.02, showarrow=False, font=dict(size=14, color='indigo'))
+    
     # Creating Trip Duration per User Type Box Plot
     user_box = go.Figure()
 
@@ -323,11 +391,6 @@ elif page == 'Trip Duration':
                              height=600)
     user_box.update_yaxes(title_text='Trip Duration', title=dict(font=dict(size=16, color='midnightblue')))
 
-    # Calculating number of trips exceeding 24 hours.
-    Below1hr = filtered[filtered['trip_duration'] < 3_600].shape[0]
-    From1to24hrs = filtered.loc[filtered['trip_duration'].between(3_600, 86_400)].shape[0]
-    Over24hrs = filtered[filtered['trip_duration'] > 86_400].shape[0]
-
     col1, col2 = st.columns([3, 1])
 
     with st.container():
@@ -335,21 +398,20 @@ elif page == 'Trip Duration':
             st.plotly_chart(duration_line, use_container_width=True)
         with col2:
             st.plotly_chart(user_box, use_container_width=True)
-        st.caption(f'Total trips below 1 hour sum-up to {Below1hr*12.5:,.0f}, between 1 - 24 hours sum up to {From1to24hrs*12.5:,.0f}, and over 24 hours sum up to {Over24hrs*12.5:,.0f}.')
-        st.markdown("""*Trips have a short average duration of about 15 minutes, except on Saturdays and Sundays when the average increases to 18 and 22 minutes respectively, suggesting longer commutes or recreations. The line-bar chart suggests there is a high flow of bike usage during weekdays, especially Wednesdays, when bike volume is high and trip duration is low. When analyzed from a user perspective; however, members take an average of about 12 minutes per trip while casual users take an average of 27 minutes on classic bikes and 22 minutes on electric bikes, suggesting depletion at popular start stations. The trip count increase from Thursday to Saturday indicates that demand is affected by immediate availability and bike station restocking on these 4 days highlighting the need for active rebalancing, especially in start stations near touristic sites.*""")
+        st.markdown("""*Trips have a short average duration of about 15 minutes, except on Saturdays and Sundays when the average increases to 18 and 22 minutes respectively, suggesting longer commutes or recreations. The line-bar chart suggests there is a high flow of bike usage during weekdays, especially Wednesdays, when bike volume is high and trip duration is low. When analyzed from a user perspective; however, members take an average of about 12 minutes per trip while casual users take an average of 27 minutes on classic bikes and 22 minutes on electric bikes, suggesting depletion at popular start stations. Moreover, the trip count increase from Wednesday to Saturday indicates that demand is affected by immediate availability and bike station restocking on these 4 days highlighting the need for active rebalancing, especially in start stations near touristic sites.*""")
         st.markdown("""*There also exists many extremely long rentals that alter total trip durations such as the 18,788 trips lasting from 1 hours to almost 24 hours. The CitiBikes Day Pass is also likely causing the 1,775 trips that exceed the 24 hour duration.*""")
         st.markdown("""**🤔 The effect of CitiBike's 30-minute policy on spatial patterns remains unclear due to the lack of data on customer complaints and bike stocking at station.**""")
 
 ######################################## Actionable Insights ####################################
 elif page == 'Actionable Insights':
-    st.markdown('### How much to scale back between November and April?')
+    st.markdown('### Reducing costs by scaling back between November and April.')
 
-    st.markdown("""Given the significant fluctuations of Citibike's monthly demand, we suggest transitioning to a dynamic month-by-month scaling strategy. The below table outlines a strategic monthly fleet reduction based on daily ride demand for each bike type indexed against the August high, with a safe margin to accommodate service level variations. Since both bike types follow similar seasonal patterns, expanding in December and contracting in April with further decreases afterwards, we can safely maintain November service levels with approximately 74% of the fleet size. This intentional reduction creates a maintenance and bike substitution window that does not compromise the user experience.""")
+    st.markdown("""As we analyzed monthly demand it was evident there are significant fluctuations as shown by the average daily rides shown below. In sight of this, we suggest transitioning to a dynamic month-by-month scaling strategy that reduces operational costs. The below table outlines a strategic monthly fleet reduction based on daily ride demand for each bike type indexed against the August high, with a safe margin to accommodate service level variations. Since both bike types follow similar seasonal patterns, expanding in December and contracting in April with further decreases afterwards, we can safely maintain November service levels with approximately 74% of the fleet size. This intentional reduction creates a maintenance and bike substitution window that does not compromise the user experience.""")
 
     st.dataframe(fleetPlan)
     st.markdown("""The above also confirms that our fleet is currently operating with significant seasonal inefficiency across CitiBike stations, with waterfront stations experiencing the highest concentration of activity, suggesting suboptimal resource allocation. It's thus advisable to relocate water stations along the waterfront.""")
 
-    st.markdown('### How many more stations to add along the water?')
+    st.markdown('### Enhancing resilience to seasonal fluctuations by adding more stations along the water.')
     summary_df = waterStations[waterStations['section']=='summary']
     waterStations_df = waterStations[waterStations['section']=='scenario_options']
 
@@ -368,7 +430,7 @@ elif page == 'Actionable Insights':
 
 ########################################### Recommendations #######################################
 else:
-    st.markdown('### Stations Recommendations:')
+    st.markdown('### Determining the optimal timeframe for fleet health to recover lost revenue from stockouts:')
 
     day_order = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
     time_order = ['Morning', 'Afternoon', 'Evening', 'Night']
@@ -381,11 +443,11 @@ else:
                          height=400)
 
     st.markdown("""
-    - The below heatmap confirms member users have a preference (probability) to ride bikes during mid-week mornings (Tuesday to Friday), which when combined with the cool weather and short trip preference previously observed suggests a commuter usage. While casual users seem to rent bike for leisure purposes given their warm weather, longer trips, and night riding preference especially on the weekend.""")
+    - The below heatmap shows late-night activity has the lowest member ridership probability. Member users have a preference (probability) to ride bikes during mid-week mornings (Tuesday to Friday), which when combined with the cool weather and short trip preference previously observed suggests a commuter usage. While casual users seem to rent bike for leisure purposes given their warm weather, longer trips, and night riding preference especially on the weekend.""")
     
     st.plotly_chart(day_prob, use_container_width=True)
     
-    st.markdown("""Our model's stability depends on 3 high-density hubs that require close monitoring to ensure they remain stocked before and throughout the business day: Grove St. PATH (42,550 average daily starts), South Waterfront Walkway (34,200) and Hoboken Terminal (33,000). These stations experience a very high demand that will require overnight and early morning re-stocking to prevent depletion. Additionally, Hamilton Park and Marin Light Rail show a demand time compression of 36.5% and 35.8% respectively. This indicates that these stations deplete faster than the operations team can handle. Failure to implement advanced predictive stocking at these nodes will result in system wide availability failures and lost revenue.""")
+    st.markdown("""Our model's stability depends on 3 high-density hubs that require close monitoring to ensure they remain stocked before and throughout the business day: Grove St. PATH (42,556 average daily starts), South Waterfront Walkway (34,245) and Hoboken Terminal at River St. & Hudson Pl. (33,020). These stations experience a very high demand that will require overnight and early morning re-stocking to prevent depletion. Additionally, Hamilton Park and Marin Light Rail show a demand time compression of 36.5% and 35.8% respectively. This indicates that these stations deplete faster than the operations team can handle. Failure to implement advanced predictive stocking at these nodes will result in system wide availability failures and lost revenue.""")
 
     st.dataframe(restockingPlan)
     st.subheader('**Additional Strategy Recommendations: CitiBike should focus on the following objectives moving forward to counter distribution inefficiencies.**')
