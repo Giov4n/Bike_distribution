@@ -8,3 +8,4 @@ plotly==6.5.0
 pymongo==4.15.5
 streamlit==1.52.2
 streamlit_keplergl==0.3.0
+setuptools=79.0.1
