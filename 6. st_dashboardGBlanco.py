@@ -33,7 +33,7 @@ def new_session():
 
 new_session()
 
-ONBOARDING_STEPS = [{'title': 'Welcome! 👋', 'description': "This dashboard helps you explore CitiBike's trip data with key metrics designed to capture insights and suggest strategic operational changes. The insights shown on the charts are based on an 8% representative sample of the full dataset to balance performance and accuracy. The patterns, trends and directional changes reflect the overall population, but exact totals are only shown on the sidebar and chart callouts. Chart figures that appear upon hovering can be multiplied by 12.5 to derive the complete dataset figure."},
+ONBOARDING_STEPS = [{'title': 'Welcome! 👋', 'description': "This dashboard helps you explore CitiBike's trip data with key metrics designed to capture insights and suggest strategic operational changes. The insights shown on the charts are based on an 8% representative sample of the full dataset to balance performance and accuracy. The patterns, trends and directional changes reflect the overall population, but exact totals are only shown on the sidebar and chart annotations. Chart figures that appear upon hovering can be multiplied by 12.5 to derive the complete dataset figure."},
                     {'title': 'Navigation', 'description': "👈 Use the sidebar to filter data and switch views. The **Section Selector** dropdown menu on the left will take you to the analysis details of each aspect starting at Overview."},
                     {'title': 'Interacting with Charts', 'description': "Hover over charts to see details. You can also zoom on the data by selecting directly on the chart the part you would like to view in more detail. Keep in mind charts and tables are designed for exploratory analysis that preserves meaningful patterns."},
                     {'title': "Ready to enjoy?", 'description': "All Visuals update automatically. You can now explore the dashboard on your own."}]
@@ -220,16 +220,16 @@ pio.templates['Dashboard_Theme'] = go.layout.Template(
 pio.templates.default = 'Dashboard_Theme'
 ################################################ Overview Page #############################################
 if page == 'Overview':
-    st.markdown('#### This dashboard analyzes real CitiBike trip data to suggest strategic operational changes aimed at circumventing bike availability issues voiced by customers.')
-    st.markdown("""**This analysis is separated into 5 sections that analyze how each aspect contributes to availability issues:**
+    st.markdown('#### This dashboard analyzes real CitiBike trip data to suggest strategic operational changes that enhance net income and address logistical issues with bike availability voiced by customers.')
+    st.markdown("""**The analysis is separated into 5 sections that examines how each aspect contributes to availability issues:**
 
     - Daily rides correlation to weather temperatures
-    - Trip duration
     - Geographic routes and stations
+    - Trip duration
     - Actionable Insights
-    - Conclusions and Recommendations""")
+    - Recommendations""")
 
-    st.markdown("""**Please note this analysis uses pre-processed data sourced from the CitiBike's website and NOAA API for La Guardia (NY) Weather, which included bike type; start station name, ID, lattitude and longitude; end station name, ID, lattitude and longitude; trip start and end times; user type and average temperature.**""")
+    st.markdown("""**Please note this analysis uses pre-processed data sourced from the CitiBike's website and NOAA's API for NY weather data, which included bike type; start station name, ID, lattitude and longitude; end station name, ID, lattitude and longitude; trip start and end times; user type and average temperature.**""")
 
 
     stationimage = Image.open(io.BytesIO(CB_photo))
@@ -294,7 +294,7 @@ elif page == 'Daily Weather vs Rides':
         with col2:
             st.plotly_chart(userTemp_box, use_container_width=True)
     
-        st.markdown("""*The daily rides and weather temperatures strong positive correlation of 0.814 suggests trips increase at similar levels as temperatures, but decline slightly when temperatures exceed the 30°C. The trip spikes between May and November seem to indicate the availability issues may be prevalent during the warm to cool temperature months.*""")
+        st.markdown("""*The analysis started by understanding trip patterns by correlating daily rides with weather temperatures. These showed a strong positive correlation of 0.814 suggesting trips increase at similar levels as temperatures, but decline slightly when temperatures exceed the 30°C. The trip spikes between May and November seem to indicate the availability issues may be prevalent during the warm to cool temperature months.*""")
         st.markdown("""*The box plot lower whiskers confirms members are more resilient to low temperatures, while the interquartile range boxes confirm that most trips take place during warm to cool weather temperatures with members riding bikes at a median of 17.8°C and casual users prefering warmer temperatures with a median of about 20.5°C. The presence of docked bikes for casual users suggests bikes used for recreational purposes remain locked mostly during high season months.*""")
 
 ######################################## Stations & Routes Map ####################################
@@ -326,7 +326,11 @@ elif page == 'Stations & Routes':
             st.plotly_chart(fig_top20, use_container_width=True)
         st.markdown(f':green[The Top 4 stations account for {Top4_proportion:.2%} of the all trips recorded in 2022.]')
 
-        st.markdown("""*The origin-destination pairs connected by the map arcs ⋒ reveal that Hoboken City is the busiest zone with the most intra-zonal flows. The most popular start stations, located near the Hudson River, are also part of the most popular routes: Grove St. PATH to Montgomery St. covering a distance of 6 blocks (895 trips), South Waterfront Walkway – Sinatra Dr. & 1st St to Bloomfield St. & 15th St covering a distance of 18 blocks (with 977 trips), Hoboken Terminal on River St & Hudson Pl. to Church Sq. Park on 5 St & Park Ave. covering a distance of 11 blocks (968 trips), Hoboken Terminal on Hudson St. & Hudson Place to Columbus Park on Clinton St. & 9 St. covering a short distance of 15 blocks (with 977 trips).*""")
+        st.markdown("""*Let's now look at station and route activity. The origin-destination pairs connected by the map arcs ⋒ reveal that Hoboken City is the busiest zone with the most intra-zonal flows. The most popular start stations, located near the Hudson River, are also part of the most popular routes:
+        - Grove St. PATH to Montgomery St. covering a distance of 6 blocks (895 trips)
+        - South Waterfront Walkway – Sinatra Dr. & 1st St to Bloomfield St. & 15th St covering a distance of 18 blocks (with 977 trips)
+        - Hoboken Terminal on River St & Hudson Pl. to Church Sq. Park on 5 St & Park Ave. covering a distance of 11 blocks (968 trips)
+        - Hoboken Terminal on Hudson St. & Hudson Place to Columbus Park on Clinton St. & 9 St. covering a short distance of 15 blocks (with 977 trips).*""")
         st.markdown("""*These 4 Stations account for almost approximately 15.66% of the total bike rental trips. Their strategic location near the water combined with the city's transit network gateway offered by the Hoboken Terminal make the small-town charm of Hoboken City an atractive zone. New Jersey City is the second busiest zone and interestingly the least connected zone is New York City, which accounts for most inactive end stations suggesting a bridge crossing difficulty.*""")
 
 ############################################ Trip Duration Charts #########################################
@@ -373,7 +377,7 @@ elif page == 'Trip Duration':
     From1to24hrs = filtered['trip_duration'].between(3_600, 86_400).sum()
     Over24hrs = (filtered['trip_duration'] > 86_400).sum()
     
-    duration_line.add_annotation(text=f'Total trips below 1 hour: {Below1hr*12.5:,.0f}<br>between 1 - 24 hours: {From1to24hrs*12.5:,.0f}<br>over 24 hours: {Over24hrs*12.5:,.0f}', xref='paper', yref='paper', x=0.001, y=1.02, showarrow=False, font=dict(size=14, color='indigo'))
+    duration_line.add_annotation(text=f'Total trips between 1 - 24 hours: {From1to24hrs*12.5:,.0f}<br>over 24 hours: {Over24hrs*12.5:,.0f}', xref='paper', yref='paper', x=0.001, y=1.02, showarrow=False, font=dict(size=14, color='black'))
     
     # Creating Trip Duration per User Type Box Plot
     user_box = go.Figure()
@@ -398,7 +402,7 @@ elif page == 'Trip Duration':
             st.plotly_chart(duration_line, use_container_width=True)
         with col2:
             st.plotly_chart(user_box, use_container_width=True)
-        st.markdown("""*Trips have a short average duration of about 15 minutes, except on Saturdays and Sundays when the average increases to 18 and 22 minutes respectively, suggesting longer commutes or recreations. The line-bar chart suggests there is a high flow of bike usage during weekdays, especially Wednesdays, when bike volume is high and trip duration is low. When analyzed from a user perspective; however, members take an average of about 12 minutes per trip while casual users take an average of 27 minutes on classic bikes and 22 minutes on electric bikes, suggesting depletion at popular start stations. Moreover, the trip count increase from Wednesday to Saturday indicates that demand is affected by immediate availability and bike station restocking on these 4 days highlighting the need for active rebalancing, especially in start stations near touristic sites.*""")
+        st.markdown("""*The operational dynamic is better understood when considering the duration of trips each day. Trips have a short average duration of about 15 minutes, except on Saturdays and Sundays when the average increases to 18 and 22 minutes respectively, suggesting longer commutes or recreations. The line-bar chart suggests there is a high flow of bike usage during weekdays, especially Wednesdays, when bike volume is high and trip duration is low. When analyzed from a user perspective; however, members take an average of about 12 minutes per trip while casual users take an average of 27 minutes on classic bikes and 22 minutes on electric bikes, suggesting depletion at popular start stations. Moreover, the trip count increase from Wednesday to Saturday indicates that demand is affected by immediate availability and bike station restocking on these 4 days highlighting the need for active rebalancing, especially in start stations near touristic sites.*""")
         st.markdown("""*There also exists many extremely long rentals that alter total trip durations such as the 18,788 trips lasting from 1 hours to almost 24 hours. The CitiBikes Day Pass is also likely causing the 1,775 trips that exceed the 24 hour duration.*""")
         st.markdown("""**🤔 The effect of CitiBike's 30-minute policy on spatial patterns remains unclear due to the lack of data on customer complaints and bike stocking at station.**""")
 
@@ -406,10 +410,10 @@ elif page == 'Trip Duration':
 elif page == 'Actionable Insights':
     st.markdown('### Reducing costs by scaling back between November and April.')
 
-    st.markdown("""As we analyzed monthly demand it was evident there are significant fluctuations as shown by the average daily rides shown below. In sight of this, we suggest transitioning to a dynamic month-by-month scaling strategy that reduces operational costs. The below table outlines a strategic monthly fleet reduction based on daily ride demand for each bike type indexed against the August high, with a safe margin to accommodate service level variations. Since both bike types follow similar seasonal patterns, expanding in December and contracting in April with further decreases afterwards, we can safely maintain November service levels with approximately 74% of the fleet size. This intentional reduction creates a maintenance and bike substitution window that does not compromise the user experience.""")
+    st.markdown("""While analyzing monthly demand it was evident significant fluctuations existed as shown by the average daily rides shown below. In sight of this, we suggest transitioning to a dynamic month-by-month scaling strategy that reduces operational costs. The below table outlines a strategic monthly fleet reduction based on daily ride demand for each bike type indexed against the August high, with a safe margin to accommodate service level variations. Since both bike types follow similar seasonal patterns, expanding in December and contracting in April with further decreases afterwards, we can safely maintain November service levels with approximately 74% of the fleet size. This intentional reduction creates a maintenance and bike substitution window that does not compromise the user experience.""")
 
     st.dataframe(fleetPlan)
-    st.markdown("""The above also confirms that our fleet is currently operating with significant seasonal inefficiency across CitiBike stations, with waterfront stations experiencing the highest concentration of activity, suggesting suboptimal resource allocation. It's thus advisable to relocate water stations along the waterfront.""")
+    st.markdown("""The above also confirms that our fleet is currently operating with significant seasonal inefficiency across CitiBike stations, with waterfront stations experiencing the highest concentration of activity, suggesting suboptimal resource allocation. It's thus advisable to relocate certain water stations along the waterfront.""")
 
     st.markdown('### Enhancing resilience to seasonal fluctuations by adding more stations along the water.')
     summary_df = waterStations[waterStations['section']=='summary']
@@ -426,7 +430,7 @@ elif page == 'Actionable Insights':
         with col4:
             st.metric(label='Trip Share of Existing Water Stations', value=f"{summary_df.loc[summary_df.metric == 'Trip Share of Existing Water Stations', 'value'].iloc[0]}")
         st.dataframe(waterStations_df[['Load Multiplier', 'Required Water Stations', 'Additional Water Stations']].set_index('Load Multiplier'))
-        st.markdown("""Currently, there are 21 waterfront stations located within 300 meters of the water, which represent approximately 6.56% of the total operating stations. However, these stations account for over 1/3 of all trips, indicating that each waterfront station received approximately 5.6 more trips than the average station. Based on this information, I calculated the number of stations that could be relocated to the waterfront while maintaining the total number of stations at 320 using a load multiplier that safely reduces the existing 5.6x load to a maximum of 3x. To operate effectively at 3x load, we would need a total of 40 waterfront stations. Since we already have 21, this means we need to relocate 19 additional stations along the water. Start with this as the targeted pilot plan that relocates 19 of the existing spatially close non-water stations that are experiencing low activity and increase it to 98 progressively so as to not affect other non-waterfront station operations.""")
+        st.markdown("""Currently, there are 21 waterfront stations located within 300 meters of the water, which represent approximately 6.56% of the total operating stations. However, these stations account for over 1/3 of all trips, indicating that each waterfront station received approximately 5.6 more trips than the average station. Based on this information, the number of stations that could be relocated to the waterfront while maintaining the total number of stations at 320 was calculated using a load multiplier that safely reduces the existing 5.6x load to a maximum of 3x. To operate effectively at 3x load, we would need a total of 40 waterfront stations. Since we already have 21, this means we need to relocate 19 additional stations along the water. Start a targeted pilot plan that relocates 19 of the existing spatially close non-water stations that are experiencing low activity and increase it to 98 progressively so as to not affect other non-waterfront station operations.""")
 
 ########################################### Recommendations #######################################
 else:
@@ -443,20 +447,20 @@ else:
                          height=400)
 
     st.markdown("""
-    - The below heatmap shows late-night activity has the lowest member ridership probability. Member users have a preference (probability) to ride bikes during mid-week mornings (Tuesday to Friday), which when combined with the cool weather and short trip preference previously observed suggests a commuter usage. While casual users seem to rent bike for leisure purposes given their warm weather, longer trips, and night riding preference especially on the weekend.""")
+    - The Member Probability heatmap helps us identify the optimal window for fleet health. It shows late-night activity has the lowest member ridership probability. We can also see member users have a preference (probability) to ride bikes during mid-week mornings (Tuesday to Friday), which when combined with the cool weather and short trip preference previously observed suggests a commuter usage suggesting the need for rapid rebalancing at transit stations. While casual users seem to rent bike for leisure purposes given their warm weather, longer trips, and night riding preference especially on the weekend.""")
     
     st.plotly_chart(day_prob, use_container_width=True)
     
-    st.markdown("""Our model's stability depends on 3 high-density hubs that require close monitoring to ensure they remain stocked before and throughout the business day: Grove St. PATH (42,556 average daily starts), South Waterfront Walkway (34,245) and Hoboken Terminal at River St. & Hudson Pl. (33,020). These stations experience a very high demand that will require overnight and early morning re-stocking to prevent depletion. Additionally, Hamilton Park and Marin Light Rail show a demand time compression of 36.5% and 35.8% respectively. This indicates that these stations deplete faster than the operations team can handle. Failure to implement advanced predictive stocking at these nodes will result in system wide availability failures and lost revenue.""")
+    st.markdown("""Furthermore, our model's stability depends on 3 high-density hubs that require close monitoring to ensure they remain stocked before and throughout the business day: Grove St. PATH (42,556 average daily starts), South Waterfront Walkway (34,245) and Hoboken Terminal at River St. & Hudson Pl. (33,020). These stations experience a very high demand that will require overnight and early morning re-stocking to prevent depletion. Additionally, Hamilton Park and Marin Light Rail show a demand time compression of 36.5% and 35.8% respectively. This indicates that these stations deplete faster than the operations team can handle. We can overcome these issues with the below advanced predictive stocking that help these nodes circumvent system wide availability failures and lost revenue.""")
 
     st.dataframe(restockingPlan)
     st.subheader('**Additional Strategy Recommendations: CitiBike should focus on the following objectives moving forward to counter distribution inefficiencies.**')
 
     st.markdown("""
-    - Improve the model's adaption to seasonal volatility by correlating bike ride trends with weather forecasts to plan short-term logistics, especially during peak usage months from June to October and for newly relocated waterfront stations.
+    - Improve the model's adaption to seasonal volatility by correlating bike ride trends with weather forecasts to plan short-term logistics, especially during peak usage months from June to October.
     - Prioritize dock usage in residential areas and transit hubs during winter and in leisure areas starting in May when temperatures cross the 15°C threshold to manage the rapid surge in demand.
     - Consider having dedicated crews in charge of adjusting bike fleet size during early mornings at 6 a.m. to avoid depletion at start stations, especially from Wednesdays to Saturdays.
     - Counter availability issues with flexible dock usage combined with planned maintenance periods during night windows and frequent electric bikes rotation during the extreme cold identified in February.
     - Implement user alerts to guide riders towards nearby stations with available docks during peak traffic times.
     - Consider redistributing other station resources from low usage areas in New York City to other high demand zones near residential areas and transit hubs.
-    - Overstock stations near other touristic attractions and incentivize riders to return bikes to low-stock stations with ride credits or discounts, special packages and special events at unpopular stations that encourage a balance bike use.""")
+    - Overstock stations near other touristic attractions and incentivize riders to return bikes to low-stock stations with ride credits or discounts, special packages and special events at unpopular stations that encourage a balanced bike use.""")
