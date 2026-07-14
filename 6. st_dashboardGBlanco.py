@@ -457,7 +457,7 @@ else:
     
     st.markdown("""Furthermore, our model's stability depends on 3 high-density hubs that require close monitoring to ensure they remain stocked before and throughout the business day: Grove St. PATH (42,556 average daily starts), South Waterfront Walkway (34,245) and Hoboken Terminal at River St. & Hudson Pl. (33,020). These stations experience a very high demand that will require overnight and early morning re-stocking to prevent depletion. Additionally, Hamilton Park and Marin Light Rail show a demand time compression of 36.5% and 35.8% respectively. This indicates that these stations deplete faster than the operations team can handle. We can overcome these issues with the below advanced predictive stocking that help these nodes circumvent system wide availability failures and lost revenue.""")
 
-#    st.dataframe(restockingPlan)
+    st.dataframe(pd.DataFrame(restockingPlan))
     st.subheader('**Additional Strategy Recommendations: CitiBike should focus on the following objectives moving forward to counter distribution inefficiencies.**')
 
     st.markdown("""
