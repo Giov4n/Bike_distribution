@@ -446,8 +446,8 @@ else:
     day_prob = go.Figure(data=go.Heatmap(z=heatmap_df.values, x=heatmap_df.columns, y=heatmap_df.index, hoverongaps=False, text=(heatmap_df.values*100), texttemplate='%{text:.2f}%', textfont={'size':13}))
 
     day_prob.update_layout(title=dict(text='Member Probability of Riding per Day (2022)', x=0.5, xanchor= 'center', font=dict(size=18, color='navy', family='bree, sans-serif')),
-                         xaxis = dict(tickfont=dict(size=15, family='bree, sans-serif', color='midnightblue'),
-                         yaxis = dict(tickfont=dict(size=15, family='bree, sans-serif', color='midnightblue'),
+                         xaxis = dict(tickfont=dict(size=15, family='bree, sans-serif', color='midnightblue')),
+                         yaxis = dict(tickfont=dict(size=15, family='bree, sans-serif', color='midnightblue')),
                          height=400)
 
     st.markdown("""
