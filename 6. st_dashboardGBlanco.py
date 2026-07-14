@@ -436,20 +436,24 @@ elif page == 'Actionable Insights':
 else:
     st.markdown('### Determining the optimal timeframe for fleet health to recover lost revenue from stockouts:')
 
+    @st.cache_data
+    def day_prob_data(df):
+        return(df.groupby(['day_name', 'time_period'], observed=False)['member_casual'].apply(lambda x: (x=='member').mean()).reset_index(name='P(MemberperDay)'))
     day_order = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
     time_order = ['Morning', 'Afternoon', 'Evening', 'Night']
-    dayProb = bikeTrips.groupby(['day_name', 'time_period'], observed=False)['member_casual'].apply(lambda x: (x=='member').mean()).reset_index(name='P(MemberperDay)')
-    day_prob = go.Figure(data=go.Heatmap(z=dayProb['P(MemberperDay)'], x=dayProb['day_name'], y=dayProb['time_period'], hoverongaps=False, text=(dayProb['P(MemberperDay)']*100).values, texttemplate='%{text:.2f}%', textfont={'size':13}))
+    dayProb = day_prob_data(bikeTrips)
+    heatmap_df = dayProb.pivot(index='time_period', columns='day_name', values='P(MemberperDay)').reindex(index=time_order, columns=day_order)
+    day_prob = go.Figure(data=go.Heatmap(z=heatmap_df.values, x=heatmap_df.columns, y=heatmap_df.index, hoverongaps=False, text=(heatmap_df.values*100), texttemplate='%{text:.2f}%', textfont={'size':13}))
 
     day_prob.update_layout(title=dict(text='Member Probability of Riding per Day (2022)', x=0.5, xanchor= 'center', font=dict(size=18, color='navy', family='bree, sans-serif')),
-                         xaxis = dict(tickfont=dict(size=15, family='bree, sans-serif', color='midnightblue'), categoryorder='array', categoryarray=day_order),
-                         yaxis = dict(tickfont=dict(size=15, family='bree, sans-serif', color='midnightblue'), categoryorder='array', categoryarray=time_order, autorange='reversed'),
+                         xaxis = dict(tickfont=dict(size=15, family='bree, sans-serif', color='midnightblue'),
+                         yaxis = dict(tickfont=dict(size=15, family='bree, sans-serif', color='midnightblue'),
                          height=400)
 
     st.markdown("""
     - The Member Probability heatmap helps us identify the optimal window for fleet health. It shows late-night activity has the lowest member ridership probability. We can also see member users have a preference (probability) to ride bikes during mid-week mornings (Tuesday to Friday), which when combined with the cool weather and short trip preference previously observed suggests a commuter usage suggesting the need for rapid rebalancing at transit stations. While casual users seem to rent bike for leisure purposes given their warm weather, longer trips, and night riding preference especially on the weekend.""")
     
-    st.plotly_chart(day_prob, use_container_width=True)
+    st.plotly_chart(day_prob, width='stretch')
     
     st.markdown("""Furthermore, our model's stability depends on 3 high-density hubs that require close monitoring to ensure they remain stocked before and throughout the business day: Grove St. PATH (42,556 average daily starts), South Waterfront Walkway (34,245) and Hoboken Terminal at River St. & Hudson Pl. (33,020). These stations experience a very high demand that will require overnight and early morning re-stocking to prevent depletion. Additionally, Hamilton Park and Marin Light Rail show a demand time compression of 36.5% and 35.8% respectively. This indicates that these stations deplete faster than the operations team can handle. We can overcome these issues with the below advanced predictive stocking that help these nodes circumvent system wide availability failures and lost revenue.""")
 
