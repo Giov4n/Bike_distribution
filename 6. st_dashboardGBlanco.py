@@ -412,7 +412,7 @@ elif page == 'Actionable Insights':
 
     st.markdown("""While analyzing monthly demand it was evident significant fluctuations existed as shown by the average daily rides shown below. In sight of this, we suggest transitioning to a dynamic month-by-month scaling strategy that reduces operational costs. The below table outlines a strategic monthly fleet reduction based on daily ride demand for each bike type indexed against the August high, with a safe margin to accommodate service level variations. Since both bike types follow similar seasonal patterns, expanding in December and contracting in April with further decreases afterwards, we can safely maintain November service levels with approximately 74% of the fleet size. This intentional reduction creates a maintenance and bike substitution window that does not compromise the user experience.""")
 
-    st.dataframe(fleetPlan)
+    st.dataframe(pd.DataFrame(fleetPlan))
     st.markdown("""The above also confirms that our fleet is currently operating with significant seasonal inefficiency across CitiBike stations, with waterfront stations experiencing the highest concentration of activity, suggesting suboptimal resource allocation. It's thus advisable to relocate certain water stations along the waterfront.""")
 
     st.markdown('### Enhancing resilience to seasonal fluctuations by adding more stations along the water.')
@@ -429,7 +429,7 @@ elif page == 'Actionable Insights':
             st.metric(label='Share of Total Stations', value=f"{summary_df.loc[summary_df.metric == 'Existing Water Stations Share of Total Stations', 'value'].iloc[0]}")
         with col4:
             st.metric(label='Trip Share of Existing Water Stations', value=f"{summary_df.loc[summary_df.metric == 'Trip Share of Existing Water Stations', 'value'].iloc[0]}")
-        st.dataframe(waterStations_df[['Load Multiplier', 'Required Water Stations', 'Additional Water Stations']].set_index('Load Multiplier'))
+        st.dataframe(pd.DataFrame(waterStations_df[['Load Multiplier', 'Required Water Stations', 'Additional Water Stations']].set_index('Load Multiplier')))
         st.markdown("""Currently, there are 21 waterfront stations located within 300 meters of the water, which represent approximately 6.56% of the total operating stations. However, these stations account for over 1/3 of all trips, indicating that each waterfront station received approximately 5.6 more trips than the average station. Based on this information, the number of stations that could be relocated to the waterfront while maintaining the total number of stations at 320 was calculated using a load multiplier that safely reduces the existing 5.6x load to a maximum of 3x. To operate effectively at 3x load, we would need a total of 40 waterfront stations. Since we already have 21, this means we need to relocate 19 additional stations along the water. Start a targeted pilot plan that relocates 19 of the existing spatially close non-water stations that are experiencing low activity and increase it to 98 progressively so as to not affect other non-waterfront station operations.""")
 
 ########################################### Recommendations #######################################
